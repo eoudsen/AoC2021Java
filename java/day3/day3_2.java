@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class day3 {
+public class day3_2 {
 
     public static List<String> getFileContent(final String fileName) {
         try(var bufferedReader = Files.newBufferedReader(Paths.get(fileName), StandardCharsets.UTF_8)) {
@@ -27,29 +27,33 @@ public class day3 {
                 counter++;
             }
         }
-        return counter >= (double) bitStrings.size() / (double) 2 ? 1 : 0;
+        return counter >= (double) bitStrings.size() /  (double) 2 ? 1 : 0;
     }
 
     public static Integer solve(final List<String> input) {
-        var gammaList = new ArrayList<Integer>();
+        var oxygenList = new ArrayList<>(input);
         for (var i = 0; i < input.get(0).length(); i++) {
-            gammaList.add(getMostCommon(input, i));
-        }
-
-        var epsilonList = new ArrayList<Integer>();
-        for (var val : gammaList) {
-            if (val == 1) {
-                epsilonList.add(0);
-            } else {
-                epsilonList.add(1);
+            final var index = i;
+            var mostCommon = getMostCommon(oxygenList, index);
+            oxygenList = (ArrayList<String>) oxygenList.stream().filter(x -> Integer.valueOf(x.substring(index, index + 1)).equals(mostCommon)).collect(Collectors.toList());
+            if (oxygenList.size() == 1) {
+                break;
             }
         }
 
-        var gamma = Integer.parseInt(gammaList.stream().map(String::valueOf).collect(Collectors.joining()) , 2);
-        var epsilon = Integer.parseInt(epsilonList.stream().map(String::valueOf).collect(Collectors.joining()), 2);
+        var coList = new ArrayList<>(input);
+        for (var i = 0; i < input.get(0).length(); i++) {
+            final var index = i;
+            var mostCommon = getMostCommon(coList, index) == 1 ? 0 : 1;
+            coList = (ArrayList<String>) coList.stream().filter(x -> Integer.valueOf(x.substring(index, index + 1)).equals(mostCommon)).collect(Collectors.toList());
+            if (coList.size() == 1) {
+                break;
+            }
+        }
 
-
-        return gamma * epsilon;
+        var oxygen = Integer.parseInt(oxygenList.get(0), 2);
+        var co = Integer.parseInt(coList.get(0), 2);
+        return oxygen * co;
     }
 
     public static void main(String... args) {
